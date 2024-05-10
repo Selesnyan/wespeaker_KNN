@@ -74,16 +74,12 @@ def run_epoch(dataloader,
             if use_lennorm_embeddings:
                 embeds /= torch.unsqueeze(torch.norm(embeds, dim=1), dim=1)
 
-            logits_sos = model.module.projection_speech(embeds, None)  # speech or silence?
-            logits_sid = model.module.projection(embeds, None)      # speaker ID 
+            outputs = model.module.projection(embeds, None)
 
             if use_per_frame_embeddings:
-                outputs = torch.hstack((-logits_sos, logits_sos + logits_sid))
-                
                 targets = targets.flatten() 
-                loss_sid = criterion(outputs, targets)
-                
-                loss = loss_sid # + loss_sos
+                loss = criterion(outputs, targets)
+
 
         # loss, acc
         loss_meter.add(loss.item())
